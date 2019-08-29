@@ -12,7 +12,7 @@ interpVec = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
 T = 0.0
 
 dt = 0.1917
-t_n = 5000
+t_n = 5e4
 V = np.array([0., 0., 0., 0.])
 fn = V
 steps = t_n/dt
@@ -58,21 +58,14 @@ def interp(vn, tn):
     interpVec[4] = tn + T/f[0]
     return interpVec
 
-def phiFn(v):
-    expp = exp(2*v[1] + 2*np.sqrt(3)*v[0])
-    expm = exp(2*v[1] - 2*np.sqrt(3)*v[0])
-    expy = exp(-4*v[1])
-    phi = 8*v[2]*(p(v[2], 2) - 3*(p(v[3], 2))) + expm*(v[2] + sqrt(3)*v[3]) - 2*expy*v[2] + expp*(v[2] - sqrt(3)*v[3])
-
-    return phi
-
 t0 = time.time()
 
 initConds = [[0., 0.]]
 count = 0
 condArray = [0]
 
-f= open("initCondsH=0125.txt","r")
+f= open("initCondsContour.txt","r")
+#f= open("initCondsH=0125.txt","r")
 
 if f.mode == 'r':
     contents = f.readlines()
@@ -84,15 +77,17 @@ for s in range(0, int(count/2)):
     initConds = np.append(initConds, [[condArray[2*s + 1], condArray[2*s + 2]]], axis = 0)
 
 initConds = np.delete(initConds, 0, 0)
-initConds = np.array([0.44, 0.13, 0.0, 0.0])
+#initConds = np.array([0.0, 0.1, 0.0, 0.0])   #Regular Orbit
+#initConds = np.array([0.0, -0.1, 0.0, 0.0])  #Chaotic Orbit
+initConds = np.array([0.0, 0.44, 0.0, 0.13])  #Sticky Orbit
 
 #initials = np.size(initConds, 0)
 initials = 1
 print(initials)
 
 valsX = np.zeros(initials)
-valsY = np.array([initConds[0]])#initConds[:, 0]
-valsPy = np.array([initConds[1]])#initConds[:, 1]
+valsY = np.array([initConds[1]])#initConds[:, 0]
+valsPy = np.array([initConds[3]])#initConds[:, 1]
 valsPx = np.zeros(initials)
 
 xi = 0.0
@@ -100,16 +95,17 @@ yi = 0.0
 pxi = 0.0
 pyi = 0.0
 
-#x = np.zeros(int(steps))
-#y = np.zeros(int(steps))
-
 for k in range(0, initials):
     xi = valsX[k]
     yi = valsY[k]
     pyi = valsPy[k]
+    #print '', xi, ', ', yi, ', ', pyi
     pxi = sqrt(2*(H0 + p(yi, 3)/3 - p(xi, 2)*yi) - p(xi, 2) - p(yi, 2) - p(pyi, 2))
     valsPx[k] = pxi
     #print(pxi)
+
+initConds[2] = pxi
+#print(initConds)
 
 plt.scatter(valsY, valsPy, s = 1, c = 'black')
 
@@ -161,9 +157,6 @@ while i <= (steps - 1.0):
         
         #l = l + 1
     
-    #x[i] = V[0]
-    #y[i] = V[1]
-    
     i = i + 1 
 
 t1 = time.time()
@@ -174,7 +167,6 @@ print 'H = ', H0
 print 'iterations: ', steps
 print 'crossings: ', j
 
-plt.title('Poincare Surface Section at $x = 0$ for $H_1 = 1/8$ via $ABA864$', fontsize = 16)
 plt.xlabel('$y$', fontsize = 12)
 plt.ylabel('$p_y$', fontsize = 12)
 

@@ -5,10 +5,11 @@ from math import pow as p
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import time
 
 #V = np.array([0.55, 0.1, 0.54, 0.01])   #Regular Orbit
 #V = np.array([0.55, 0.1, 0.005, 0.01])  #Chaotic Orbit
-V = np.array([0.1, 0.1, 0.1, 0.1])  #Chaotic Orbit
+V = np.array([0.1, 0.10001, 0.1, 0.1])      #Chaotic Orbit
 V_new = np.zeros(4)
 
 K = 0.5
@@ -17,7 +18,7 @@ B = 0.05
 tp = 2*np.pi
 V = V*tp/12
 
-steps = 1e4
+steps = 1e5#9.2e5
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
@@ -31,6 +32,8 @@ def standMap(v):
 
     return V_new
 
+t0 = time.time()
+
 for i in range(0, int(steps)):
     V = standMap(V)
 
@@ -41,9 +44,16 @@ for i in range(0, int(steps)):
     colour = np.sin(tp*V[3])/2 + 0.5
 
     ax.scatter(V[0], V[1], V[2], s=2, c=(colour, 0.0, 0.5), depthshade=True)
-#    plt.scatter(V[0], V[1], s=2, c='black')
 
-ax.set_title('4D Standard Map with $K = 0.5$, $B = 0.05$')
+#    if i > 7.64e5:
+#        ax.scatter(V[0], V[1], V[2], s=2, c=(colour, 0.0, 0.5), depthshade=True)
+    #plt.scatter(V[0], V[1], s=2, c='black')
+
+t1 = time.time()
+
+print 'Elapsed time: ', t1 - t0
+
+#ax.set_title('4D Standard Map with $K = 0.5$, $B = 0.05$')
 ax.set_xlabel('$x_1$')
 ax.set_ylabel('$x_2$')
 ax.set_zlabel('$x_3$')
